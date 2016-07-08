@@ -26,13 +26,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef __CYGWIN__
-# include <ncurses/curses.h>
-#else
-# include <curses.h>
-#endif
-
+#include <curses.h>
 #include <time.h>
 #include <regex.h>
 
@@ -176,6 +170,7 @@ clear_board (CurrentState *state)
 
 	nlines += 3;
 
+/**
 	if (LINES < nlines) {
 		close_display ();
 		fprintf (stderr, "%s: %s\n", program_name,
@@ -188,6 +183,7 @@ clear_board (CurrentState *state)
 			 _("insufficient columns on display"));
 		exit (10);
 	}
+**/
 
 	boardwin = newwin (nlines, 69, 0, 0);
 	wbkgdset (boardwin, attrs[COLOUR_DATA]);
@@ -247,10 +243,10 @@ _update_cell (CurrentState *state,
 	      int           car,
 	      int           type)
 {
-	int                  y, x, sz, align, attr;
-	CarAtom             *atom;
-	unsigned const char *text;
-	size_t               len, pad;
+	int         y, x, sz, align, attr;
+	CarAtom    *atom;
+	const char *text;
+	size_t      len, pad;
 
 	y = state->car_position[car - 1];
 	if (! y)
@@ -271,7 +267,7 @@ _update_cell (CurrentState *state,
 			sz = 2;
 			align = 1;
 			break;
-		case RACE_DRIVER:
+		case RACE_DRIVER :
 			x = 6;
 			sz = 14;
 			align = -1;
@@ -415,17 +411,17 @@ _update_cell (CurrentState *state,
 			break;
 		case QUALIFYING_SECTOR_1:
 			x = 48;
-			sz = 3;
+			sz = 5;
 			align = 1;
 			break;
 		case QUALIFYING_SECTOR_2:
 			x = 54;
-			sz = 3;
+			sz = 5;
 			align = 1;
 			break;
 		case QUALIFYING_SECTOR_3:
 			x = 60;
-			sz = 3;
+			sz = 5;
 			align = 1;
 			break;
 		case QUALIFYING_LAP:
@@ -444,9 +440,6 @@ _update_cell (CurrentState *state,
 	atom = &state->car_info[car - 1][type];
 	attr = attrs[atom->data];
 	text = atom->text;
-
-	if (text[0] == 0xE2) text = "*";
-
 	len = strlen ((const char *) text);
 
 	/* Check for over-long atoms */
@@ -649,8 +642,8 @@ update_status (CurrentState *state)
 	}
 
 	/* Display weather */
-/*
-	int wline = 5;
+
+	int wline = 3;
 	wattrset (statwin, attrs[COLOUR_DATA]);
  
 	wmove (statwin, wline, 0);
@@ -701,15 +694,31 @@ update_status (CurrentState *state)
 	wprintw(statwin, "%-2s%6dmb", "", state->pressure);
 	wmove (statwin, wline, 6);
 	waddch (statwin, '.');
-*/
+
 	/* Update fastest lap line (race only) */
 
+/*
 	if (state->event_type == RACE_EVENT)
 	{
 		wmove (boardwin, nlines - 1, 3);
 		wattrset (boardwin, attrs[COLOUR_RECORD]);
 		wclrtoeol (boardwin);
 		wprintw(boardwin, "%2s %-14s %4s %4s %8s", state->fl_car, state->fl_driver, "LAP", state->fl_lap, state->fl_time);
+	}
+*/
+	if (state->event_type == RACE_EVENT)
+	{
+		wline += 2;
+		wmove (statwin, wline, 0);
+		wclrtoeol (statwin);
+		wprintw(statwin, "Best Lap");
+		wline++;
+		wmove (statwin, wline, 0);
+		wclrtoeol (statwin);
+/*		wmove (statwin, wline, 6); */
+/*		waddch (statwin, '.'); */
+		wattrset (statwin, attrs[COLOUR_RECORD]);
+		wprintw(statwin, "%-3s (%s) %4s %-4s \n%8s", state->fl_driver, state->fl_car, " \nLAP", state->fl_lap, state->fl_time);
 	}
 
 	/* Update session clock */
@@ -737,7 +746,7 @@ _update_time (CurrentState *state)
 	if (! statwin)
 		return;
 
-	wmove (statwin, nlines - 1, 2);
+	wmove (statwin, nlines - 3, 2);
 	wattrset (statwin, attrs[COLOUR_DATA]);
 
 	// Pause the clock during a red flag, but only for Qualifying and the Race.
