@@ -1,8 +1,8 @@
 This is a small silly modification I made to the live-f1 client by
-daz. I modified some values in the output so it can be run properly
-in a CGA or EGA computer via telnet to a linux machine. Uploaded
-for archival only since FIA changed their live timing some years
-ago and this will probably not work anymore.
+daz. I modified some values to reformat the output so it can be
+run properly in a CGA or EGA computer via telnet to a linux machine.
+Uploaded for archival only since FIA changed their live timing some
+years ago and this will probably not work anymore.
 
 Original README:
 live-f1 is a native Linux client for viewing the official Formula-1
